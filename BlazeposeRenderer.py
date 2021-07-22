@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import open3d as o3d
+#import open3d as o3d
 from o3d_utils import create_segment, create_grid
 
 # LINES_BODY is used when drawing the skeleton onto the source image. 
