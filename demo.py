@@ -10,6 +10,10 @@ import os
 from random import sample
 import array
 import numpy as np
+import tracker
+##################
+tracker.turn_on()
+##################
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-e', '--edge', action="store_true",
@@ -224,46 +228,86 @@ current_pose_list,current_pose_numbers = pose_difficulty_selecter(0,7)
 
 
 while True:
+########## tracker testing
+########## finish tracker testing
+
     # Run blazepose on next frame
     landmarks = np.array([])
-    frame, body, landmarks = pose.next_frame()
-    if frame is None: break
+    frame0, body, landmarks = pose.next_frame()
+    print("Body : ", body)
+    if frame0 is None: break
     # Draw 2d skeleton
-    frame = renderer.draw(frame, body)
+    frame = renderer.draw(frame0, body)
 ############################# start new stuff ########################
-    print("landmarks: ", landmarks)
-    print("landmark type", type(landmarks))
+    # print("landmarks: ", landmarks)
+
+    #extract desired landmarks 
+    body_part = 0
+    desired_pose = int(current_pose_numbers[current_pose])
+    # print("current pose number : ", desired_pose)
+    NoneType = type(None)
+    if type(landmarks) != NoneType:
+        landmarks_to_save = []
+        for poses in landmarks:
+            x = landmarks[body_part][0]
+            y = landmarks[body_part][1]
+            z = landmarks[body_part][2]
+            if (body_part > 10 and body_part < 17) or (body_part > 22):
+                landmarks_to_save.append(x)
+                landmarks_to_save.append(y)
+                landmarks_to_save.append(z)
+            body_part += 1
+        
+
+
+
+
     
     #paste example image on input image
-    print("example pose : ",current_pose_list[current_pose])
+    # print("example pose : ",current_pose_list[current_pose])
     img = cv2.imread(current_pose_list[current_pose])   
     #adjust example size
     ratio = img.shape[0]/img.shape[1]
-    print("ratio = ",ratio)
+    # print("ratio = ",ratio)
     example_width = 200
     example_height = int((200 * ratio))
-    img = cv2.resize(img,(example_width,example_height),interpolation = cv2.INTER_AREA)
+    img2 = cv2.resize(img,(example_width,example_height),interpolation = cv2.INTER_AREA)
     x_offset = frame.shape[1] - example_width
     y_offset = frame.shape[0]-example_height
     x_end = frame.shape[1]
     y_end = frame.shape[0]
     #put black rectange on right side
     cv2.rectangle(frame,((frame.shape[1]-180),0), (frame.shape[1],frame.shape[0]),(0,0,0),-1)
-    frame[y_offset:y_end,x_offset:x_end] = img
+    frame[y_offset:y_end,x_offset:x_end] = img2
 
-    #extract desired landmarks 
-    body_part = 0
-    desired_pose = int(current_pose_numbers[current_pose])
-    print("current pose number : ", desired_pose)
-    NoneType = type(None)
-    if type(landmarks) != NoneType:
-        landmarks_to_save = []
-        for poses in landmarks:
-            if (body_part > 10 and body_part < 17) or (body_part > 22):
-                landmarks_to_save.append(landmarks[body_part][0])
-                landmarks_to_save.append(landmarks[body_part][1])
-                landmarks_to_save.append(landmarks[body_part][2])
-            body_part += 1
+    # #extract desired landmarks 
+    # body_part = 0
+    # desired_pose = int(current_pose_numbers[current_pose])
+    # # print("current pose number : ", desired_pose)
+    # NoneType = type(None)
+    # if type(landmarks) != NoneType:
+    #     landmarks_to_save = []
+    #     #get the far left and far right X position output of the landmarks
+    #     xMin = 1000000
+    #     xMax = 0
+    #     print("frame shape [0]", frame0.shape[1])
+    #     for poses in landmarks:
+    #         x = landmarks[body_part][0]
+    #         y = landmarks[body_part][1]
+    #         z = landmarks[body_part][2]
+    #         if x > xMax:
+    #             xMax = x 
+    #             print("Xmax landmark: ", body_part, " location: ", xMax)
+    #         if x < xMin:
+    #             xMin = x 
+    #         if (body_part > 10 and body_part < 17) or (body_part > 22):
+    #             landmarks_to_save.append(x)
+    #             landmarks_to_save.append(y)
+    #             landmarks_to_save.append(z)
+    #         body_part += 1
+    #     cv2.circle(frame,(int(xMin * frame0.shape[1]),10), 10, (0,0,255), -1)
+    #     cv2.circle(frame,(int(xMax * frame0.shape[1]),10), 10, (255,0,255), -1)
+
 
 
 
