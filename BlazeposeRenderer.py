@@ -1,7 +1,8 @@
 import cv2
 import numpy as np
-#import open3d as o3d
-from o3d_utils import create_segment, create_grid
+import tracker
+# import open3d as o3d
+# from o3d_utils import create_segment, create_grid
 
 # LINES_BODY is used when drawing the skeleton onto the source image. 
 # Each variable is a list of continuous lines.
@@ -75,9 +76,27 @@ class BlazeposeRenderer:
             cv2.polylines(self.frame, lines, False, (255, 180, 90), 2, cv2.LINE_AA)
             
             # for i,x_y in enumerate(body.landmarks_padded[:,:2]):
+            
+            #get the far left and far right X position output of the landmarks
+            xMin = 1000000
+            xMax = -100000
             for i,x_y in enumerate(body.landmarks[:self.pose.nb_kps,:2]):
 ##############################################################################################
-                # print("Landmark: ",i, " position: ", lines)
+                xLocation = x_y[0]
+                print("Landmark: ",i, " position: ", xLocation)
+
+                if xLocation > xMax:
+                    xMax = xLocation 
+                    print("Xmax landmark: ", i, " location: ", xMax)
+                if xLocation < xMin:
+                    xMin = xLocation 
+                    print("Xmin landmark: ", i, " location: ", xMin)
+
+
+
+
+
+
 ##############################################################################################
                 if i > 10:
                     color = (0,255,0) if i%2==0 else (0,0,255)
@@ -88,6 +107,24 @@ class BlazeposeRenderer:
                 else:
                     color = (0,0,255)
                 cv2.circle(self.frame, (x_y[0], x_y[1]), 4, color, -11)
+############################
+            # tracker.rotate(True,5)
+            #Set area to rotate camera if person is outside area
+            person_middle = int((xMax-xMin)/2 + xMin)
+            left_wall = int(self.frame.shape[0] *.4)
+            right_wall = int(self.frame.shape[0] * .6)
+            print("IMage width = ", self.frame.shape[0])
+            cv2.circle(self.frame,(int(xMin),10), 10, (0,0,255), -1)
+            cv2.circle(self.frame,(int(xMax),10), 10, (255,0,255), -1)
+            cv2.circle(self.frame,(person_middle,10), 10, (0,255,0), -1)
+
+            if person_middle < left_wall:
+                tracker.rotate(False,5)            
+            if person_middle > right_wall:
+                tracker.rotate(True,5)
+####################################################
+
+
 
             if self.show_3d:
                 self.vis3d.clear_geometries()
@@ -124,7 +161,7 @@ class BlazeposeRenderer:
     def waitKey(self, delay=1):
         if self.show_fps:
                 self.pose.fps.draw(self.frame, orig=(50,50), size=1, color=(240,180,100))
-        cv2.imshow("Blazepose", self.frame)
+        # cv2.imshow("Blazepose", self.frame)
         if self.output:
             self.output.write(self.frame)
         key = cv2.waitKey(delay) 
