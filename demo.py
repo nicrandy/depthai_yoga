@@ -236,6 +236,7 @@ while True:
     frame0, body, landmarks = pose.next_frame()
     print("Body : ", body)
     if frame0 is None: break
+
     # Draw 2d skeleton
     frame = renderer.draw(frame0, body)
 ############################# start new stuff ########################

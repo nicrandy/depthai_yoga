@@ -104,7 +104,7 @@ class BlazeposeDepthai:
                 if "831" in str(lm_model):
                     self.internal_fps = 18
                 elif "full" in str(self.lm_model):
-                    self.internal_fps = 14
+                    self.internal_fps = 20
                 else:
                     self.internal_fps = 27
             else:
@@ -169,6 +169,7 @@ class BlazeposeDepthai:
         cam = pipeline.create(dai.node.ColorCamera) 
         cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
         cam.setInterleaved(False)
+
         cam.setIspScale(self.scale_nd[0], self.scale_nd[1])
         cam.setFps(self.internal_fps)
         cam.setBoardSocket(dai.CameraBoardSocket.RGB)

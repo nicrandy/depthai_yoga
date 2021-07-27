@@ -111,17 +111,21 @@ class BlazeposeRenderer:
             # tracker.rotate(True,5)
             #Set area to rotate camera if person is outside area
             person_middle = int((xMax-xMin)/2 + xMin)
-            left_wall = int(self.frame.shape[0] *.4)
-            right_wall = int(self.frame.shape[0] * .6)
+            left_wall = int(self.frame.shape[1] *.45)
+            right_wall = int(self.frame.shape[1] * .55)
             print("IMage width = ", self.frame.shape[0])
+            print("IMage width = ", self.frame.shape[1])
             cv2.circle(self.frame,(int(xMin),10), 10, (0,0,255), -1)
             cv2.circle(self.frame,(int(xMax),10), 10, (255,0,255), -1)
             cv2.circle(self.frame,(person_middle,10), 10, (0,255,0), -1)
 
             if person_middle < left_wall:
-                tracker.rotate(False,5)            
+                if person_middle < int(self.frame.shape[1] *.5):
+                    tracker.rotate(False,5)            
             if person_middle > right_wall:
-                tracker.rotate(True,5)
+                if person_middle > int(self.frame.shape[1] *.5):
+
+                    tracker.rotate(True,5)
 ####################################################
 
 
@@ -149,6 +153,7 @@ class BlazeposeRenderer:
 
 
     def draw(self, frame, body):
+
         self.frame = frame
         if body:
             self.draw_landmarks(body)
