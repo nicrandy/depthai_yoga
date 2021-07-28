@@ -192,6 +192,12 @@ def calculate_score(current_pose_percentage):
             grade = 'S'
         return grade
 
+LINES_BODY = [[9,10],[4,6],[1,3],
+                    [12,14],[14,16],[16,20],[20,18],[18,16],
+                    [12,11],[11,23],[23,24],[24,12],
+                    [11,13],[13,15],[15,19],[19,17],[17,15],
+                    [24,26],[26,28],[32,30],
+                    [23,25],[25,27],[29,31]]
 def draw_lines_blank_canvas(body,blank_image):
     LINES_BODY = [[28,30,32,28,26,24,12,11,23,25,27,29,31,27], 
                 [23,24],
@@ -230,21 +236,6 @@ current_pose_list,current_pose_numbers = pose_difficulty_selecter(0,7)
 #################### end new stuff
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 while True:
 ########## tracker testing
 ########## finish tracker testing
@@ -275,10 +266,11 @@ while True:
     cam_ratio = just_cam.shape[0]/just_cam.shape[1]
     cam_width = bg_canvas.shape[1]/2
     cam_height = cam_width*cam_ratio
+    print("cam ration:",cam_ratio)
     cam_dim = (int(cam_width),int(cam_height))
     just_cam = cv2.resize(just_cam,cam_dim,interpolation = cv2.INTER_AREA)
 
-    #past cam output on bg_canvas
+    #paste cam output on bg_canvas
     bg_canvas[0:just_cam.shape[0],0:just_cam.shape[1]] = just_cam
 
 
@@ -300,37 +292,42 @@ while True:
     NoneType = type(None)
     if type(landmarks) != NoneType:
 
-        # #draw landmarks on blank image then past on bg_canvas
-        # blank_width = cam_width
-        # blank_height = blank_width * cam_ratio
-        # blank_image = np.zeros((int(blank_height),int(blank_width),3),np.uint8)
-        # print("Body:",body, "Lankmarks:",landmarks)
-        # lined_blank_image = draw_lines_blank_canvas(body,blank_image)
-        # bg_canvas[just_cam.shape[0]:bg_canvas.shape[0],0:lined_blank_image.shape[1]] = lined_blank_image        
-
-
-        blank_width = just_cam.shape[1]
-        blank_height = just_cam.shape[0]
-        blank_image = np.zeros((int(blank_height),int(blank_width),3),np.uint8)
-        print("Body:",body, "Lankmarks:",landmarks)
-        lined_blank_image = draw_lines_blank_canvas(body,blank_image)
-        lined_blank_image = cv2.resize(lined_blank_image,(int(lined_blank_image.shape[0]/2),int(lined_blank_image.shape[1]/2)),interpolation = cv2.INTER_AREA)
-        bg_canvas[just_cam.shape[0]:bg_canvas.shape[0],0:lined_blank_image.shape[1]] = lined_blank_image
-
-        # cv2.imshow("blank image:",lined_blank_image)
-
-
+        #draw landmarks on area below cam image
+        canvas_max_width = cam_width
+        canvas_max_height = canvas_max_width * cam_ratio
+        positions = []
+        for landmark in landmarks:
+            x,y,z = landmark
+            x_loc = int(x*canvas_max_width)
+            y_loc = int(y*canvas_max_height+cam_height)
+            positions.append([x_loc,y_loc])
+            cv2.circle(bg_canvas,(x_loc,y_loc), 5, (200,100,255), -1)
+        print("Positions ",positions, "positions size",len(positions))
+        for line in LINES_BODY:
+            print("Line : ",line)
+            bg_canvas = cv2.line(bg_canvas,positions[line[0]],positions[line[1]],(0, 255, 0),8)
 
         landmarks_to_save = []
         for poses in landmarks:
             x = landmarks[body_part][0]
             y = landmarks[body_part][1]
             z = landmarks[body_part][2]
-            if (body_part > 10 and body_part < 17) or (body_part > 22):
-                landmarks_to_save.append(x)
-                landmarks_to_save.append(y)
-                landmarks_to_save.append(z)
-            body_part += 1
+            landmarks_to_save.append(x)
+            landmarks_to_save.append(y)
+
+
+
+
+        # landmarks_to_save = []
+        # for poses in landmarks:
+        #     x = landmarks[body_part][0]
+        #     y = landmarks[body_part][1]
+        #     z = landmarks[body_part][2]
+        #     if (body_part > 10 and body_part < 17) or (body_part > 22):
+        #         landmarks_to_save.append(x)
+        #         landmarks_to_save.append(y)
+        #         landmarks_to_save.append(z)
+        #     body_part += 1
         
 
 

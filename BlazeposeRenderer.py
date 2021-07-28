@@ -72,7 +72,6 @@ class BlazeposeRenderer:
         if self.show_landmarks:                
             list_connections = LINES_BODY
             lines = [np.array([body.landmarks[point,:2] for point in line]) for line in list_connections]
-            print("Render lines:", lines)
             # lines = [np.array([body.landmarks_padded[point,:2] for point in line]) for line in list_connections]
             cv2.polylines(self.frame, lines, False, (255, 180, 90), 2, cv2.LINE_AA)
             
@@ -84,14 +83,14 @@ class BlazeposeRenderer:
             for i,x_y in enumerate(body.landmarks[:self.pose.nb_kps,:2]):
 ##############################################################################################
                 xLocation = x_y[0]
-                print("Landmark: ",i, " position: ", xLocation)
+                # print("Landmark: ",i, " position: ", xLocation)
 
                 if xLocation > xMax:
                     xMax = xLocation 
-                    print("Xmax landmark: ", i, " location: ", xMax)
+                    # print("Xmax landmark: ", i, " location: ", xMax)
                 if xLocation < xMin:
                     xMin = xLocation 
-                    print("Xmin landmark: ", i, " location: ", xMin)
+                    # print("Xmin landmark: ", i, " location: ", xMin)
 
 
 
@@ -114,8 +113,6 @@ class BlazeposeRenderer:
             person_middle = int((xMax-xMin)/2 + xMin)
             left_wall = int(self.frame.shape[1] *.45)
             right_wall = int(self.frame.shape[1] * .55)
-            print("IMage width = ", self.frame.shape[0])
-            print("IMage width = ", self.frame.shape[1])
             cv2.circle(self.frame,(int(xMin),10), 10, (0,0,255), -1)
             cv2.circle(self.frame,(int(xMax),10), 10, (255,0,255), -1)
             cv2.circle(self.frame,(person_middle,10), 10, (0,255,0), -1)
