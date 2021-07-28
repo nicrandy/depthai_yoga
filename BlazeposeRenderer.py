@@ -72,6 +72,7 @@ class BlazeposeRenderer:
         if self.show_landmarks:                
             list_connections = LINES_BODY
             lines = [np.array([body.landmarks[point,:2] for point in line]) for line in list_connections]
+            print("Render lines:", lines)
             # lines = [np.array([body.landmarks_padded[point,:2] for point in line]) for line in list_connections]
             cv2.polylines(self.frame, lines, False, (255, 180, 90), 2, cv2.LINE_AA)
             
